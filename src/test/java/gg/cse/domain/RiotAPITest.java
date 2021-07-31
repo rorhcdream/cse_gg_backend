@@ -3,13 +3,19 @@ package gg.cse.domain;
 import gg.cse.dto.riotDto.MatchDto;
 import gg.cse.dto.riotDto.SummonerDto;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ContextConfiguration;
 
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+@SpringBootTest
+@ContextConfiguration(classes = RiotAPI.class)
 public class RiotAPITest {
-    RiotAPI riotAPI = new RiotAPI();
+    @Autowired
+    RiotAPI riotAPI;
 
     @Test
     public void get_summoner_with_name_test() {

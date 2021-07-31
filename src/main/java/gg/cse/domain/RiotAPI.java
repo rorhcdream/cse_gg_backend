@@ -2,6 +2,7 @@ package gg.cse.domain;
 
 import gg.cse.dto.riotDto.MatchDto;
 import gg.cse.dto.riotDto.SummonerDto;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -14,10 +15,11 @@ import java.util.List;
 
 @Component
 public class RiotAPI {
-    final String api_key = "<riot-api-key>";
-    final String base_url = "https://%s.api.riotgames.com";
-    final String kr_region = "kr";
-    final String asia_region = "asia";
+    @Value("${riot-api-key}")
+    private String api_key;
+    private final String base_url = "https://%s.api.riotgames.com";
+    private final String kr_region = "kr";
+    private final String asia_region = "asia";
 
     public SummonerDto getSummonerWithName(String summonerName) {
         final String path = "/lol/summoner/v4/summoners/by-name/";
