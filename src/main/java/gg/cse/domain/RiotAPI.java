@@ -1,6 +1,8 @@
 package gg.cse.domain;
 
-import gg.cse.dto.riotDto.SummonerDTO;
+import gg.cse.dto.riotDto.MatchDto;
+import gg.cse.dto.riotDto.SummonerDto;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -8,19 +10,52 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.List;
+
 @Component
 public class RiotAPI {
-    public SummonerDTO getSummonerWithName(String summonerName) {
-        final String uri = "https://kr.api.riotgames.com/lol/summoner/v4/summoners/by-name/";
-        final String api_key = "<riot-api-key>";
+    final String api_key = "<riot-api-key>";
+    final String base_url = "https://%s.api.riotgames.com";
+    final String kr_region = "kr";
+    final String asia_region = "asia";
+
+    public SummonerDto getSummonerWithName(String summonerName) {
+        final String path = "/lol/summoner/v4/summoners/by-name/";
+        String url = String.format(base_url, kr_region) + path + summonerName;
 
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
         headers.set("X-Riot-Token", api_key);
         HttpEntity<String> request = new HttpEntity<>(headers);
-        ResponseEntity<SummonerDTO> response =
-                restTemplate.exchange(uri + summonerName, HttpMethod.GET, request, SummonerDTO.class);
+        ResponseEntity<SummonerDto> response =
+                restTemplate.exchange(url, HttpMethod.GET, request, SummonerDto.class);
         return response.getBody();
+    }
 
+    public List<String> getMatchHistory(String puuid) {
+        final String path = "/lol/match/v5/matches/by-puuid/%s/ids";
+        String url = String.format(base_url, asia_region) + String.format(path, puuid);
+
+        RestTemplate restTemplate = new RestTemplate();
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("X-Riot-Token", api_key);
+        HttpEntity<String> request = new HttpEntity<>(headers);
+        ResponseEntity<List<String>> response =
+                restTemplate.exchange(url, HttpMethod.GET, request,
+                        new ParameterizedTypeReference<List<String>>() {});
+        return response.getBody();
+    }
+
+    public MatchDto getMatchWithId(String matchId) {
+        final String path = "/lol/match/v5/matches/";
+        String url = String.format(base_url, asia_region) + path + matchId;
+
+        RestTemplate restTemplate = new RestTemplate();
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("X-Riot-Token", api_key);
+        HttpEntity<String> request = new HttpEntity<>(headers);
+        ResponseEntity<MatchDto> response =
+                restTemplate.exchange(url, HttpMethod.GET, request, MatchDto.class);
+        return response.getBody();
     }
 }

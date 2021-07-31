@@ -5,7 +5,7 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
-public class SummonerDTO {
+public class SummonerDto {
     private String accountId;
     private int profileIconId;
     private long revisionDate;
