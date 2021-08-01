@@ -41,4 +41,14 @@ public class SearchApiControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[19].info").isEmpty());
     }
+
+    @Test
+    public void search_not_existing_summoner() throws Exception {
+        String notExistingSummoner = "not_existing_summoner_name";
+        when(searchService.search(notExistingSummoner)).thenReturn(null);
+
+        mockMvc.perform(get("/api/v1/search/" + notExistingSummoner))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").doesNotExist());
+    }
 }
