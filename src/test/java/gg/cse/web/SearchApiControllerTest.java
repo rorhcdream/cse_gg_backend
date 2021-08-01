@@ -19,8 +19,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
-@WebMvcTest(SearchController.class)
-public class SearchControllerTest {
+@WebMvcTest(SearchApiController.class)
+public class SearchApiControllerTest {
     @MockBean
     SearchService searchService;
 
