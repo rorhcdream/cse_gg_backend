@@ -48,7 +48,7 @@ public class MatchHistoryApiControllerTest {
         when(matchHistoryService.matchHistory(notExistingSummoner)).thenReturn(null);
 
         mockMvc.perform(get("/api/v1/match_history/" + notExistingSummoner))
-                .andExpect(status().isOk())
+                .andExpect(status().is(404))
                 .andExpect(jsonPath("$").doesNotExist());
     }
 }
