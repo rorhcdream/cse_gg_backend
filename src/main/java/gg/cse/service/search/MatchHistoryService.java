@@ -11,10 +11,10 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @Service
-public class SearchService {
+public class MatchHistoryService {
     private final RiotAPI riotAPI;
 
-    public List<MatchDto> search(String summonerName) {
+    public List<MatchDto> matchHistory(String summonerName) {
         SummonerDto summonerDto = riotAPI.getSummonerWithName(summonerName);
         List<String> matchIds = riotAPI.getMatchHistory(summonerDto.getPuuid());
         List<MatchDto> matchDtos = new LinkedList<>();

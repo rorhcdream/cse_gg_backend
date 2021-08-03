@@ -1,7 +1,7 @@
 package gg.cse.web;
 
 import gg.cse.dto.riotDto.MatchDto;
-import gg.cse.service.search.SearchService;
+import gg.cse.service.search.MatchHistoryService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -19,10 +19,10 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
-@WebMvcTest(SearchApiController.class)
-public class SearchApiControllerTest {
+@WebMvcTest(MatchHistoryApiController.class)
+public class MatchHistoryApiControllerTest {
     @MockBean
-    SearchService searchService;
+    MatchHistoryService matchHistoryService;
 
     @Autowired
     private MockMvc mockMvc;
@@ -33,11 +33,11 @@ public class SearchApiControllerTest {
         for(int i = 0; i < 20; i++) {
             matchDtos.add(new MatchDto());
         }
-        when(searchService.search(any(String.class))).thenReturn(matchDtos);
+        when(matchHistoryService.matchHistory(any(String.class))).thenReturn(matchDtos);
 
         String summonerName = "Hide on bush";
 
-        mockMvc.perform(get("/api/v1/search/" + summonerName))
+        mockMvc.perform(get("/api/v1/match_history/" + summonerName))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[19].info").isEmpty());
     }
@@ -45,9 +45,9 @@ public class SearchApiControllerTest {
     @Test
     public void search_not_existing_summoner() throws Exception {
         String notExistingSummoner = "not_existing_summoner_name";
-        when(searchService.search(notExistingSummoner)).thenReturn(null);
+        when(matchHistoryService.matchHistory(notExistingSummoner)).thenReturn(null);
 
-        mockMvc.perform(get("/api/v1/search/" + notExistingSummoner))
+        mockMvc.perform(get("/api/v1/match_history/" + notExistingSummoner))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").doesNotExist());
     }

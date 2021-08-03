@@ -18,7 +18,7 @@ import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.any;
 
 @ExtendWith(MockitoExtension.class)
-class SearchServiceTest {
+class MatchHistoryServiceTest {
     @Mock
     RiotAPI riotAPI;
 
@@ -26,7 +26,7 @@ class SearchServiceTest {
     SummonerDto summonerDto;
 
     @InjectMocks
-    SearchService searchService;
+    MatchHistoryService matchHistoryService;
 
     @Test
     void search() {
@@ -40,7 +40,7 @@ class SearchServiceTest {
         when(riotAPI.getMatchHistory(any(String.class))).thenReturn(matchIds);
         when(riotAPI.getMatchWithId(any(String.class))).thenReturn(new MatchDto());
 
-        List<MatchDto> result = searchService.search("Hide on bush");
+        List<MatchDto> result = matchHistoryService.matchHistory("Hide on bush");
         assertEquals(result.size(), 3);
     }
 }
