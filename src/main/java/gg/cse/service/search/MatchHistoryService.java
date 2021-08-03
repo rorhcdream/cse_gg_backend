@@ -16,6 +16,8 @@ public class MatchHistoryService {
 
     public List<MatchDto> matchHistory(String summonerName) {
         SummonerDto summonerDto = riotAPI.getSummonerWithName(summonerName);
+        if (summonerDto == null) return null; // no such summoner
+
         List<String> matchIds = riotAPI.getMatchHistory(summonerDto.getPuuid());
         List<MatchDto> matchDtos = new LinkedList<>();
 

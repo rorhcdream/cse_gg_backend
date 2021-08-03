@@ -9,6 +9,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
@@ -29,8 +30,14 @@ public class RiotAPI {
         HttpHeaders headers = new HttpHeaders();
         headers.set("X-Riot-Token", api_key);
         HttpEntity<String> request = new HttpEntity<>(headers);
-        ResponseEntity<SummonerDto> response =
-                restTemplate.exchange(url, HttpMethod.GET, request, SummonerDto.class);
+
+        ResponseEntity<SummonerDto> response;
+        try {
+            response = restTemplate.exchange(url, HttpMethod.GET, request, SummonerDto.class);
+        } catch (HttpClientErrorException.NotFound e) {
+            return null;
+        }
+
         return response.getBody();
     }
 

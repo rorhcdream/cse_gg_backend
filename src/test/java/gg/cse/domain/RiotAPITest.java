@@ -10,6 +10,7 @@ import org.springframework.test.context.ContextConfiguration;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 @SpringBootTest
 @ContextConfiguration(classes = RiotAPI.class)
@@ -25,6 +26,15 @@ public class RiotAPITest {
         SummonerDto summonerDto = riotAPI.getSummonerWithName(summonerName);
 
         assertEquals(summonerDto.getPuuid(), puuid);
+    }
+
+    @Test
+    public void get_summoner_with_name_when_no_such_summoner() {
+        String summonerName = "Not Existing Summoner 12345678";
+
+        SummonerDto summonerDto = riotAPI.getSummonerWithName(summonerName);
+
+        assertNull(summonerDto);
     }
 
     @Test
