@@ -31,4 +31,8 @@ dependencies {
 
 test {
     useJUnitPlatform()
+
+    if (project.hasProperty('excludeRiotAPITests')) {
+        exclude "gg/cse/domain/RiotAPITest.class"
+    }
 }
