@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -39,7 +38,7 @@ class SummonerRepositoryTest {
     @BeforeEach
     public void beforeEach() {
         summoner = Summoner.builder()
-                .id("id")
+                .summonerId("id")
                 .summonerLevel(123)
                 .puuid("puuid")
                 .name("name")
@@ -92,7 +91,7 @@ class SummonerRepositoryTest {
 
         Summoner loaded = summonerRepository.findAll().get(0);
         assertEquals(summoner, loaded);
-        assertEquals(summoner.getMatches().size(), 2);
+        assertEquals(2, summoner.getMatches().size());
     }
 
     @Transactional
@@ -106,6 +105,26 @@ class SummonerRepositoryTest {
 
         Summoner loaded = summonerRepository.getById(id);
         assertEquals(summoner, loaded);
-        assertNotEquals(loaded.getAccountId(), accountid);
+        assertNotEquals(accountid, loaded.getAccountId());
+    }
+
+    @Transactional
+    @Test
+    public void findBySummonerId() {
+        String summonerId = summoner.getSummonerId();
+        summonerRepository.save(summoner);
+
+        assertEquals(summoner, summonerRepository.findBySummonerId(summonerId).get());
+        assertTrue(summonerRepository.findBySummonerId("some non-existing id").isEmpty());
+    }
+
+    @Transactional
+    @Test
+    public void findByName() {
+        String name = summoner.getName();
+        summonerRepository.save(summoner);
+
+        assertEquals(summoner, summonerRepository.findByName(name).get());
+        assertTrue(summonerRepository.findByName("some non-existing name").isEmpty());
     }
 }

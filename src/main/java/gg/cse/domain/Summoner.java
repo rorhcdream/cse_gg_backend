@@ -20,7 +20,7 @@ public class Summoner {
     private int profileIconId;
     private long revisionDate;
     private String name;
-    private String id;
+    private String summonerId;
     private long summonerLevel;
 
     @ManyToMany
@@ -28,12 +28,12 @@ public class Summoner {
     @Builder.Default
     private List<Match> matches = new ArrayList<>();
 
-    public void update(String accountId, int profileIconId, long revisionDate, String name, String id, long summonerLevel) {
+    public void update(String accountId, int profileIconId, long revisionDate, String name, String summonerId, long summonerLevel) {
         this.accountId = accountId;
         this.profileIconId = profileIconId;
         this.revisionDate = revisionDate;
         this.name = name;
-        this.id = id;
+        this.summonerId = summonerId;
         this.summonerLevel = summonerLevel;
     }
 }
