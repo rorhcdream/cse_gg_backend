@@ -203,9 +203,7 @@ public class MatchDto {
 
     public Match toEntity() {
         ModelMapper modelMapper = ModelMapperUtil.get();
-        modelMapper.getConfiguration()
-                .setFieldAccessLevel(Configuration.AccessLevel.PRIVATE)
-                .setFieldMatchingEnabled(true);
+
         modelMapper.createTypeMap(MatchDto.class, Match.class).setProvider(
                 request -> {
                     MatchDto matchDto = (MatchDto) request.getSource();
