@@ -3,10 +3,8 @@ package gg.cse.dto.riotDto;
 import gg.cse.domain.Match;
 import gg.cse.domain.Participant;
 import gg.cse.util.ModelMapperUtil;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.Provider;
 import org.modelmapper.config.Configuration;
@@ -18,14 +16,20 @@ import java.util.stream.Collectors;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@EqualsAndHashCode
+@ToString
+@Slf4j
 public class MatchDto {
     private Info info;
     private Metadata metadata;
 
     @Getter
+    @Setter
     @NoArgsConstructor
     @AllArgsConstructor
     @Builder
+    @EqualsAndHashCode
+    @ToString
     public static class Metadata {
         private List<String> participants;
         private String matchId;
@@ -33,9 +37,12 @@ public class MatchDto {
     }
 
     @Getter
+    @Setter
     @NoArgsConstructor
     @AllArgsConstructor
     @Builder
+    @EqualsAndHashCode
+    @ToString
     public static class Info {
         private long gameCreation;
         private long gameDuration;
@@ -53,6 +60,8 @@ public class MatchDto {
     @NoArgsConstructor
     @AllArgsConstructor
     @Builder
+    @EqualsAndHashCode
+    @ToString
     public static class Participant {
         private boolean win;
         private int wardsPlaced;
@@ -164,6 +173,8 @@ public class MatchDto {
         @NoArgsConstructor
         @AllArgsConstructor
         @Builder
+        @EqualsAndHashCode
+        @ToString
         public static class Perks {
             private List<Styles> styles;
             private StatPerks statPerks;
@@ -173,6 +184,8 @@ public class MatchDto {
         @NoArgsConstructor
         @AllArgsConstructor
         @Builder
+        @EqualsAndHashCode
+        @ToString
         public static class Styles {
             private int style;
             private List<Selections> selections;
@@ -183,6 +196,8 @@ public class MatchDto {
         @NoArgsConstructor
         @AllArgsConstructor
         @Builder
+        @EqualsAndHashCode
+        @ToString
         public static class Selections {
             private int var3;
             private int var2;
@@ -194,6 +209,8 @@ public class MatchDto {
         @NoArgsConstructor
         @AllArgsConstructor
         @Builder
+        @EqualsAndHashCode
+        @ToString
         public static class StatPerks {
             private int offense;
             private int flex;
@@ -201,10 +218,42 @@ public class MatchDto {
         }
     }
 
+    public static MatchDto of(Match entity) {
+        ModelMapper modelMapper = ModelMapperUtil.get();
+
+        MatchDto.Info info = Info.builder()
+                .gameCreation(entity.getGameCreation())
+                .gameDuration(entity.getGameDuration())
+                .gameId(entity.getGameId())
+                .gameMode(entity.getGameMode())
+                .gameName(entity.getGameName())
+                .gameStartTimeStamp(entity.getGameStartTimeStamp())
+                .gameType(entity.getGameType())
+                .gameVersion(entity.getGameVersion())
+                .mapId(entity.getMapId())
+                .participants(entity.getParticipants().stream()
+                        .map(participant -> modelMapper.map(participant, Participant.class))
+                        .collect(Collectors.toList())
+                )
+                .build();
+        MatchDto.Metadata metadata = Metadata.builder()
+                .matchId(entity.getMatchId())
+                .dataVersion(entity.getDataVersion())
+                .participants(entity.getParticipants().stream()
+                        .map(gg.cse.domain.Participant::getPuuid)
+                        .collect(Collectors.toList())
+                )
+                .build();
+        return MatchDto.builder()
+                .info(info)
+                .metadata(metadata)
+                .build();
+    }
+
     public Match toEntity() {
         ModelMapper modelMapper = ModelMapperUtil.get();
 
-        modelMapper.createTypeMap(MatchDto.class, Match.class).setProvider(
+        modelMapper.typeMap(MatchDto.class, Match.class).setProvider(
                 request -> {
                     MatchDto matchDto = (MatchDto) request.getSource();
                     return new Match(
