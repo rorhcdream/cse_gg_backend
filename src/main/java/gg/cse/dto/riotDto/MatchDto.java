@@ -1,15 +1,31 @@
 package gg.cse.dto.riotDto;
 
+import gg.cse.domain.Match;
+import gg.cse.domain.Participant;
+import gg.cse.util.ModelMapperUtil;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import org.modelmapper.ModelMapper;
+import org.modelmapper.Provider;
+import org.modelmapper.config.Configuration;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Getter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class MatchDto {
     private Info info;
     private Metadata metadata;
 
     @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
     public static class Metadata {
         private List<String> participants;
         private String matchId;
@@ -17,6 +33,9 @@ public class MatchDto {
     }
 
     @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
     public static class Info {
         private long gameCreation;
         private long gameDuration;
@@ -31,6 +50,9 @@ public class MatchDto {
     }
 
     @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
     public static class Participant {
         private boolean win;
         private int wardsPlaced;
@@ -139,12 +161,18 @@ public class MatchDto {
         private int assists;
 
         @Getter
+        @NoArgsConstructor
+        @AllArgsConstructor
+        @Builder
         public static class Perks {
             private List<Styles> styles;
             private StatPerks statPerks;
         }
 
         @Getter
+        @NoArgsConstructor
+        @AllArgsConstructor
+        @Builder
         public static class Styles {
             private int style;
             private List<Selections> selections;
@@ -152,6 +180,9 @@ public class MatchDto {
         }
 
         @Getter
+        @NoArgsConstructor
+        @AllArgsConstructor
+        @Builder
         public static class Selections {
             private int var3;
             private int var2;
@@ -160,10 +191,41 @@ public class MatchDto {
         }
 
         @Getter
+        @NoArgsConstructor
+        @AllArgsConstructor
+        @Builder
         public static class StatPerks {
             private int offense;
             private int flex;
             private int defense;
         }
+    }
+
+    public Match toEntity() {
+        ModelMapper modelMapper = ModelMapperUtil.get();
+        modelMapper.getConfiguration()
+                .setFieldAccessLevel(Configuration.AccessLevel.PRIVATE)
+                .setFieldMatchingEnabled(true);
+        modelMapper.createTypeMap(MatchDto.class, Match.class).setProvider(
+                request -> {
+                    MatchDto matchDto = (MatchDto) request.getSource();
+                    return new Match(
+                            matchDto.metadata.matchId,
+                            matchDto.metadata.dataVersion,
+                            matchDto.info.gameCreation,
+                            matchDto.info.gameDuration,
+                            matchDto.info.gameId,
+                            matchDto.info.gameMode,
+                            matchDto.info.gameName,
+                            matchDto.info.gameStartTimeStamp,
+                            matchDto.info.gameType,
+                            matchDto.info.gameVersion,
+                            matchDto.info.mapId,
+                            matchDto.info.participants.stream().map(
+                                    participant -> modelMapper.map(participant, gg.cse.domain.Participant.class)
+                            ).collect(Collectors.toList())
+                    );
+                });
+        return modelMapper.map(this, Match.class);
     }
 }

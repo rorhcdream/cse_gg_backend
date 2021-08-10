@@ -8,6 +8,7 @@ import javax.persistence.Convert;
 import javax.persistence.Embeddable;
 import java.util.List;
 
+@Getter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
