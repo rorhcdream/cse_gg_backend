@@ -1,6 +1,6 @@
 package gg.cse.service.search;
 
-import gg.cse.domain.RiotAPI;
+import gg.cse.domain.*;
 import gg.cse.dto.riotDto.MatchDto;
 import gg.cse.dto.riotDto.SummonerDto;
 import org.junit.jupiter.api.Test;
@@ -11,6 +11,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -21,10 +22,10 @@ import static org.mockito.Mockito.any;
 @ExtendWith(MockitoExtension.class)
 class MatchHistoryServiceTest {
     @Mock
-    RiotAPI riotAPI;
+    SummonerRepository summonerRepository;
 
     @Mock
-    SummonerDto summonerDto;
+    MatchRepository matchRepository;
 
     @InjectMocks
     MatchHistoryService matchHistoryService;
@@ -32,29 +33,30 @@ class MatchHistoryServiceTest {
     @Test
     void match_history() {
         String summonerName = "Hide on bush";
-        List<String> matchIds = new LinkedList<>();
-        matchIds.add("abc1");
-        matchIds.add("abc2");
-        matchIds.add("abc3");
+        Match match = Match.builder()
+                .matchId("match_id")
+                .gameCreation(123L)
+                .participants(List.of(Participant.builder()
+                        .summonerName(summonerName)
+                        .build()))
+                .build();
+        Summoner summoner = Summoner.builder()
+                .name(summonerName)
+                .matches(List.of(match, match, match))
+                .build();
 
-        when(summonerDto.getPuuid()).thenReturn("some puuid");
-        when(riotAPI.getSummonerWithName(any(String.class))).thenReturn(summonerDto);
-        when(riotAPI.getMatchHistory(any(String.class))).thenReturn(matchIds);
-        when(riotAPI.getMatchWithId(any(String.class))).thenReturn(new MatchDto());
+        when(summonerRepository.findByName(summonerName)).thenReturn(Optional.of(summoner));
 
         List<MatchDto> result = matchHistoryService.matchHistory(summonerName);
-        assertEquals(result.size(), 3);
+        assertEquals(3, result.size());
+        assertEquals(summonerName, result.get(0).getInfo().getParticipants().get(0).getSummonerName());
     }
 
     @Test
     void match_history_when_no_such_summoner() {
-        String summonerName = "Not Existing Summoner Name 12345666";
-        List<String> matchIds = new LinkedList<>();
-        matchIds.add("abc1");
-        matchIds.add("abc2");
-        matchIds.add("abc3");
+        String summonerName = "Not Existing Summoner Name 123";
 
-        when(riotAPI.getSummonerWithName(any(String.class))).thenReturn(null);  // returns null
+        when(summonerRepository.findByName(any(String.class))).thenReturn(Optional.empty());  // returns null
 
         List<MatchDto> result = matchHistoryService.matchHistory(summonerName);
         assertNull(result);
