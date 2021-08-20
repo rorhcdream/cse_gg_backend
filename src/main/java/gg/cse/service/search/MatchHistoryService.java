@@ -4,6 +4,7 @@ import gg.cse.domain.*;
 import gg.cse.dto.riotDto.MatchDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,7 +26,6 @@ public class MatchHistoryService {
     @Autowired
     MatchHistoryService self;
 
-    @Transactional
     public Optional<List<MatchDto>> getMatchHistory(String summonerName) {
         Optional<Summoner> summonerOptional = summonerRepository.findByNameIgnoreCase(summonerName);
 
@@ -43,13 +43,13 @@ public class MatchHistoryService {
         }
 
         return Optional.of(
-                matches.subList(Math.max(0, matches.size() - 21), matches.size() - 1)
+                matches.subList(Math.max(0, matches.size() - 20), matches.size())
                         .stream().map(MatchDto::of).collect(Collectors.toList())
         );
     }
 
     // returns true when update success, false when no such summoner
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Transactional
     public boolean updateMatchHistory(String summonerName) {
         Optional<Summoner> summonerOptional = summonerRepository.findByNameIgnoreCase(summonerName);
         if (summonerOptional.isEmpty())  // no such summoner
@@ -57,7 +57,8 @@ public class MatchHistoryService {
 
         Summoner summoner = summonerOptional.get();
         List<Match> summonerMatches = summoner.getMatches();
-        long lastMatchTime = summonerMatches.get(summonerMatches.size() - 1).getGameCreation();
+        long lastMatchTime = summonerMatches.isEmpty() ?
+                 0 : summonerMatches.get(summonerMatches.size() - 1).getGameCreation();
 
         List<String> matchIds = riotAPI.getMatchHistory(summoner.getPuuid());
         matchIds.stream()

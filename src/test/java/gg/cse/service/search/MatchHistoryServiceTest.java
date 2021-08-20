@@ -2,11 +2,13 @@ package gg.cse.service.search;
 
 import gg.cse.domain.*;
 import gg.cse.dto.riotDto.MatchDto;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,6 +30,11 @@ class MatchHistoryServiceTest {
 
     @InjectMocks
     MatchHistoryService matchHistoryService;
+
+    @BeforeEach
+    void setUp() {
+        ReflectionTestUtils.setField(matchHistoryService, "self", matchHistoryService);
+    }
 
     @Test
     void get_match_history() {
@@ -64,6 +71,7 @@ class MatchHistoryServiceTest {
                 .build();
         Summoner summoner = Summoner.builder()
                 .name(summonerName)
+                .puuid(summonerPuuid)
                 .build();
 
         when(summonerRepository.findByNameIgnoreCase(summonerName)).thenReturn(Optional.of(summoner));
