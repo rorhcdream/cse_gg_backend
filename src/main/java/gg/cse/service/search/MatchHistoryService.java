@@ -1,32 +1,74 @@
 package gg.cse.service.search;
 
-import gg.cse.domain.Match;
-import gg.cse.domain.MatchRepository;
-import gg.cse.domain.Summoner;
-import gg.cse.domain.SummonerRepository;
+import gg.cse.domain.*;
 import gg.cse.dto.riotDto.MatchDto;
-import gg.cse.dto.riotDto.SummonerDto;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-@RequiredArgsConstructor
 @Service
 public class MatchHistoryService {
-    private final MatchRepository matchRepository;
-    private final SummonerRepository summonerRepository;
+    @Autowired
+    private MatchRepository matchRepository;
 
-    public List<MatchDto> matchHistory(String summonerName) {
+    @Autowired
+    private SummonerRepository summonerRepository;
+
+    @Autowired
+    private RiotAPI riotAPI;
+
+    @Autowired
+    MatchHistoryService self;
+
+    @Transactional
+    public Optional<List<MatchDto>> getMatchHistory(String summonerName) {
         Optional<Summoner> summonerOptional = summonerRepository.findByName(summonerName);
+
         if (summonerOptional.isEmpty())  // no such summoner
-            return null;
+            return Optional.empty();
 
         List<Match> matches = summonerOptional.get().getMatches();
 
-        return matches.stream().map(MatchDto::of).collect(Collectors.toList());
+        // update match history when no match history
+        if (matches.isEmpty()) {
+            self.updateMatchHistory(summonerName);
+            matches = summonerRepository.findByName(summonerName).get().getMatches();
+            if (matches.isEmpty())
+                return Optional.empty();
+        }
+
+        return Optional.of(
+                matches.subList(Math.max(0, matches.size() - 21), matches.size() - 1)
+                        .stream().map(MatchDto::of).collect(Collectors.toList())
+        );
+    }
+
+    // returns true when update success, false when no such summoner
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public boolean updateMatchHistory(String summonerName) {
+        Optional<Summoner> summonerOptional = summonerRepository.findByName(summonerName);
+        if (summonerOptional.isEmpty())  // no such summoner
+            return false;
+
+        Summoner summoner = summonerOptional.get();
+        List<Match> summonerMatches = summoner.getMatches();
+        long lastMatchTime = summonerMatches.get(summonerMatches.size() - 1).getGameCreation();
+
+        List<String> matchIds = riotAPI.getMatchHistory(summoner.getPuuid());
+        matchIds.stream()
+                .map(riotAPI::getMatchWithId)
+                .filter(matchDto -> matchDto.getInfo().getGameCreation() > lastMatchTime)
+                .map(MatchDto::toEntity)
+                .forEach(match -> {
+                    summonerMatches.add(match);
+                    matchRepository.save(match);
+                });
+        summonerRepository.save(summoner);
+        return true;
     }
 }
