@@ -44,4 +44,15 @@ public class SummonerDto {
                 .summonerLevel(entity.getSummonerLevel())
                 .build();
     }
+
+    public void updateEntity(Summoner entity) {
+        entity.update(
+                accountId,
+                profileIconId,
+                revisionDate,
+                name,
+                id,
+                summonerLevel
+        );
+    }
 }
