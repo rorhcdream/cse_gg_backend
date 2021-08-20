@@ -27,7 +27,7 @@ public class MatchHistoryService {
 
     @Transactional
     public Optional<List<MatchDto>> getMatchHistory(String summonerName) {
-        Optional<Summoner> summonerOptional = summonerRepository.findByName(summonerName);
+        Optional<Summoner> summonerOptional = summonerRepository.findByNameIgnoreCase(summonerName);
 
         if (summonerOptional.isEmpty())  // no such summoner
             return Optional.empty();
@@ -37,7 +37,7 @@ public class MatchHistoryService {
         // update match history when no match history
         if (matches.isEmpty()) {
             self.updateMatchHistory(summonerName);
-            matches = summonerRepository.findByName(summonerName).get().getMatches();
+            matches = summonerRepository.findByNameIgnoreCase(summonerName).get().getMatches();
             if (matches.isEmpty())
                 return Optional.empty();
         }
@@ -51,7 +51,7 @@ public class MatchHistoryService {
     // returns true when update success, false when no such summoner
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public boolean updateMatchHistory(String summonerName) {
-        Optional<Summoner> summonerOptional = summonerRepository.findByName(summonerName);
+        Optional<Summoner> summonerOptional = summonerRepository.findByNameIgnoreCase(summonerName);
         if (summonerOptional.isEmpty())  // no such summoner
             return false;
 

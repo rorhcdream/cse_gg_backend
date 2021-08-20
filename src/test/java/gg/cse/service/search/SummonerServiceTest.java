@@ -1,6 +1,5 @@
 package gg.cse.service.search;
 
-import gg.cse.domain.MatchRepository;
 import gg.cse.domain.RiotAPI;
 import gg.cse.domain.Summoner;
 import gg.cse.domain.SummonerRepository;
@@ -33,7 +32,7 @@ class SummonerServiceTest {
         Summoner summoner = Summoner.builder()
                 .name(summonerName)
                 .build();
-        when(summonerRepository.findByName(summonerName)).thenReturn(Optional.of(summoner));
+        when(summonerRepository.findByNameIgnoreCase(summonerName)).thenReturn(Optional.of(summoner));
 
         Optional<SummonerDto> summonerDtoOptional = summonerService.getSummoner(summonerName);
         assertTrue(summonerDtoOptional.isPresent());
@@ -46,7 +45,7 @@ class SummonerServiceTest {
         Summoner summoner = Summoner.builder()
                 .name(summonerName)
                 .build();
-        when(summonerRepository.findByName(summonerName)).thenReturn(Optional.empty());
+        when(summonerRepository.findByNameIgnoreCase(summonerName)).thenReturn(Optional.empty());
         when(riotAPI.getSummonerWithName(summonerName)).thenReturn(SummonerDto.of(summoner));
         when(summonerRepository.save(summoner)).thenReturn(null);
 
@@ -59,7 +58,7 @@ class SummonerServiceTest {
     @Test
     public void get_summoner_when_no_such_summoner() {
         String summonerName = "not_existing_summoner_name";
-        when(summonerRepository.findByName(summonerName)).thenReturn(Optional.empty());
+        when(summonerRepository.findByNameIgnoreCase(summonerName)).thenReturn(Optional.empty());
 
         Optional<SummonerDto> summonerDtoOptional = summonerService.getSummoner(summonerName);
         assertTrue(summonerDtoOptional.isEmpty());
@@ -76,7 +75,7 @@ class SummonerServiceTest {
                 .name(summonerName)
                 .summonerLevel(12)
                 .build();
-        when(summonerRepository.findByName(summonerName)).thenReturn(Optional.of(summoner));
+        when(summonerRepository.findByNameIgnoreCase(summonerName)).thenReturn(Optional.of(summoner));
         when(summonerRepository.save(any(Summoner.class))).thenReturn(null);
         when(riotAPI.getSummonerWithName(summonerName)).thenReturn(updateDto);
 
@@ -88,7 +87,7 @@ class SummonerServiceTest {
     @Test
     public void update_summoner_when_no_such_summoner() {
         String summonerName = "not_existing_summoner_name";
-        when(summonerRepository.findByName(summonerName)).thenReturn(Optional.empty());
+        when(summonerRepository.findByNameIgnoreCase(summonerName)).thenReturn(Optional.empty());
         when(riotAPI.getSummonerWithName(summonerName)).thenReturn(null);
 
         Optional<Summoner> summonerOptional = summonerService.updateSummoner(summonerName);

@@ -6,5 +6,5 @@ import java.util.Optional;
 
 public interface SummonerRepository extends JpaRepository<Summoner, String> {
     Optional<Summoner> findBySummonerId(String summonerId);
-    Optional<Summoner> findByName(String name);
+    Optional<Summoner> findByNameIgnoreCase(String name);
 }

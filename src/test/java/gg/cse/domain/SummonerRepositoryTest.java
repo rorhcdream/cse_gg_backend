@@ -124,7 +124,7 @@ class SummonerRepositoryTest {
         String name = summoner.getName();
         summonerRepository.save(summoner);
 
-        assertEquals(summoner, summonerRepository.findByName(name).get());
-        assertTrue(summonerRepository.findByName("some non-existing name").isEmpty());
+        assertEquals(summoner, summonerRepository.findByNameIgnoreCase(name).get());
+        assertTrue(summonerRepository.findByNameIgnoreCase("some non-existing name").isEmpty());
     }
 }

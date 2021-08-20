@@ -44,7 +44,7 @@ class MatchHistoryServiceTest {
                 .matches(List.of(match, match, match))
                 .build();
 
-        when(summonerRepository.findByName(summonerName)).thenReturn(Optional.of(summoner));
+        when(summonerRepository.findByNameIgnoreCase(summonerName)).thenReturn(Optional.of(summoner));
 
         Optional<List<MatchDto>> result = matchHistoryService.getMatchHistory(summonerName);
         assertEquals(3, result.get().size());
@@ -66,7 +66,7 @@ class MatchHistoryServiceTest {
                 .name(summonerName)
                 .build();
 
-        when(summonerRepository.findByName(summonerName)).thenReturn(Optional.of(summoner));
+        when(summonerRepository.findByNameIgnoreCase(summonerName)).thenReturn(Optional.of(summoner));
         when(riotAPI.getMatchHistory(summonerPuuid)).thenReturn(List.of("match_id"));
         when(riotAPI.getMatchWithId("match_id")).thenReturn(MatchDto.of(match));
         when(matchRepository.save(any(Match.class))).thenReturn(null);
@@ -81,7 +81,7 @@ class MatchHistoryServiceTest {
     void get_match_history_when_no_such_summoner() {
         String summonerName = "not_existing_summoner_name";
 
-        when(summonerRepository.findByName(any(String.class))).thenReturn(Optional.empty());  // returns null
+        when(summonerRepository.findByNameIgnoreCase(any(String.class))).thenReturn(Optional.empty());  // returns null
 
         Optional<List<MatchDto>> result = matchHistoryService.getMatchHistory(summonerName);
         assertTrue(result.isEmpty());
@@ -120,7 +120,7 @@ class MatchHistoryServiceTest {
                 .build();
         List<String> matchIds = List.of("match_id1", "match_id2");
 
-        when(summonerRepository.findByName(summonerName)).thenReturn(Optional.of(summoner));
+        when(summonerRepository.findByNameIgnoreCase(summonerName)).thenReturn(Optional.of(summoner));
         when(riotAPI.getMatchHistory(summonerPuuid)).thenReturn(List.of("match_id1", "match_id2"));
         when(riotAPI.getMatchWithId("match_id1")).thenReturn(MatchDto.of(newEarlierMatch));
         when(riotAPI.getMatchWithId("match_id2")).thenReturn(MatchDto.of(newLaterMatch));
@@ -139,7 +139,7 @@ class MatchHistoryServiceTest {
     @Test
     void update_match_history_when_no_such_summoner() {
         String summonerName = "not_existing_summoner_name";
-        when(summonerRepository.findByName(summonerName)).thenReturn(Optional.empty());
+        when(summonerRepository.findByNameIgnoreCase(summonerName)).thenReturn(Optional.empty());
 
         boolean updated = matchHistoryService.updateMatchHistory(summonerName);
         assertFalse(updated);
