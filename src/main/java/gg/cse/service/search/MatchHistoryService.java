@@ -32,19 +32,18 @@ public class MatchHistoryService {
         if (summonerOptional.isEmpty())  // no such summoner
             return Optional.empty();
 
-        List<Match> matches = summonerOptional.get().getMatches();
+        List<Match> matches = summonerOptional.get().getRecentMatches();
 
         // update match history when no match history
         if (matches.isEmpty()) {
             self.updateMatchHistory(summonerName);
-            matches = summonerRepository.findByNameIgnoreCase(summonerName).get().getMatches();
+            matches = summonerRepository.findByNameIgnoreCase(summonerName).get().getRecentMatches();
             if (matches.isEmpty())
                 return Optional.empty();
         }
 
         return Optional.of(
-                matches.subList(Math.max(0, matches.size() - 20), matches.size())
-                        .stream().map(MatchDto::of).collect(Collectors.toList())
+                matches.stream().map(MatchDto::of).collect(Collectors.toList())
         );
     }
 
@@ -56,19 +55,15 @@ public class MatchHistoryService {
             return false;
 
         Summoner summoner = summonerOptional.get();
-        List<Match> summonerMatches = summoner.getMatches();
-        long lastMatchTime = summonerMatches.isEmpty() ?
-                 0 : summonerMatches.get(summonerMatches.size() - 1).getGameCreation();
 
         List<String> matchIds = riotAPI.getMatchHistory(summoner.getPuuid());
-        matchIds.stream()
+        List<Match> newMatches = matchIds.stream()
                 .map(riotAPI::getMatchWithId)
-                .filter(matchDto -> matchDto.getInfo().getGameCreation() > lastMatchTime)
                 .map(MatchDto::toEntity)
-                .forEach(match -> {
-                    summonerMatches.add(match);
-                    matchRepository.save(match);
-                });
+                .collect(Collectors.toList());
+
+        matchRepository.saveAll(newMatches);
+        summoner.addMatches(newMatches);
         summonerRepository.save(summoner);
         return true;
     }

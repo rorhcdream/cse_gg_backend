@@ -9,6 +9,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -65,7 +66,7 @@ class SummonerRepositoryTest {
     @Transactional
     @Test
     public void save_load_with_matches() {
-        List<Match> matches = summoner.getMatches();
+        Set<Match> matches = summoner.getMatches();
         matches.add(match1);
         matches.add(match2);
         for (Match m : matches) {
@@ -84,7 +85,7 @@ class SummonerRepositoryTest {
         matchRepository.save(match1);
         matchRepository.save(match2);
 
-        List<Match> matches = summoner.getMatches();
+        Set<Match> matches = summoner.getMatches();
         matches.add(match1);
         matches.add(match2);
         summonerRepository.save(summoner);
