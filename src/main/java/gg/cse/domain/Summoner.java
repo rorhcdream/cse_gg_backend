@@ -25,7 +25,7 @@ public class Summoner {
 
     @ManyToMany
     @JoinTable(name = "summoner_match")
-    @OrderBy("game_creation DESC")
+    @OrderBy("game_creation ASC")
     @Builder.Default
     private Set<Match> matches = new LinkedHashSet<>();
 
@@ -40,23 +40,18 @@ public class Summoner {
 
     // returns up to num recent Match elements
     public List<Match> getRecentMatches(int num) {
-        return matches.stream().limit(num).collect(Collectors.toList());
+        return new ArrayList<>(matches).subList(Math.max(matches.size() - num, 0), matches.size());
     }
 
     public List<Match> getRecentMatches() {
         return getRecentMatches(20);
     }
 
-    // add matches in sorted order except for those already exist
+    // add matches in sorted order, only add matches that are created later than the last already existing match
     public void addMatches(List<Match> matches) {
         matches.sort(Comparator.comparingLong(Match::getGameCreation));
-
-        List<Match> newMatchList = new ArrayList<>(this.matches);
-        long latestGameCreation = newMatchList.isEmpty() ?
-                0 : newMatchList.get(newMatchList.size()-1).getGameCreation();
-        matches.stream()
-                .filter(match -> match.getGameCreation() > latestGameCreation)
-                .forEach(newMatchList::add);
-        this.matches = new LinkedHashSet<>(newMatchList);
+        long lastGameCreation = this.matches.isEmpty() ?
+                0 : new ArrayList<>(this.matches).get(this.matches.size() - 1).getGameCreation();
+        matches.stream().filter(match -> match.getGameCreation() > lastGameCreation).forEach(this.matches::add);
     }
 }

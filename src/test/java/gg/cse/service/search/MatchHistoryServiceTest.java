@@ -10,10 +10,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -108,7 +105,7 @@ class MatchHistoryServiceTest {
         Summoner summoner = Summoner.builder()
                 .name(summonerName)
                 .puuid(summonerPuuid)
-                .matches(Set.of(match))
+                .matches(new LinkedHashSet<>(Set.of(match)))
                 .build();
 
         Match newEarlierMatch = Match.builder()
