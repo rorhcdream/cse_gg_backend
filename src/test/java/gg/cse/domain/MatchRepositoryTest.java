@@ -8,7 +8,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -19,7 +21,7 @@ class MatchRepositoryTest {
 
     static List<Participant.Styles> styles;
     static List<Participant.Selections> selections;
-    static List<Participant> participants;
+    static Set<Participant> participants;
 
     @BeforeAll
     static void beforeAll() {
@@ -41,7 +43,7 @@ class MatchRepositoryTest {
         );
 
         // build participants
-        participants = new ArrayList<>();
+        participants = new HashSet<>();
         participants.add(Participant.builder()
                 .summonerName("hide on bush")
                 .summonerLevel(485)

@@ -270,7 +270,7 @@ public class MatchDto {
                             matchDto.info.mapId,
                             matchDto.info.participants.stream().map(
                                     participant -> modelMapper.map(participant, gg.cse.domain.Participant.class)
-                            ).collect(Collectors.toList())
+                            ).collect(Collectors.toSet())
                     );
                 });
         return modelMapper.map(this, Match.class);

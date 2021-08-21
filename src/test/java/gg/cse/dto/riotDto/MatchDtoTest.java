@@ -6,6 +6,8 @@ import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -63,11 +65,12 @@ class MatchDtoTest {
 
         assertEquals(matchId, match.getMatchId());
         assertEquals(gameCreation, match.getGameCreation());
-        assertEquals(summonerName1, match.getParticipants().get(0).getSummonerName());
-        assertEquals(summonerName2, match.getParticipants().get(1).getSummonerName());
-        assertEquals(defense, match.getParticipants().get(0).getPerks().getStatPerks().getDefense());
-        assertEquals(style1, match.getParticipants().get(0).getPerks().getStyles().get(0).getStyle());
-        assertEquals(style2, match.getParticipants().get(0).getPerks().getStyles().get(1).getStyle());
+        assertEquals(Set.of(summonerName1, summonerName2),
+                match.getParticipants().stream().map(gg.cse.domain.Participant::getSummonerName).collect(Collectors.toSet()));
+        assertEquals(style1,
+                match.getParticipants().stream()
+                        .filter(participant -> participant.getPerks() != null).findFirst()
+                        .get().getPerks().getStyles().get(0).getStyle());
 
         MatchDto converted = MatchDto.of(match);
         assertEquals(matchDto, converted);

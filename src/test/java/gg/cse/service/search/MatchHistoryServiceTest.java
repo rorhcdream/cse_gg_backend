@@ -40,7 +40,7 @@ class MatchHistoryServiceTest {
         Match match = Match.builder()
                 .matchId("match_id")
                 .gameCreation(123L)
-                .participants(List.of(Participant.builder()
+                .participants(Set.of(Participant.builder()
                         .summonerName(summonerName)
                         .build()))
                 .build();
@@ -63,7 +63,7 @@ class MatchHistoryServiceTest {
         Match match = Match.builder()
                 .matchId("match_id")
                 .gameCreation(123L)
-                .participants(List.of(Participant.builder()
+                .participants(Set.of(Participant.builder()
                         .summonerName(summonerName)
                         .build()))
                 .build();
@@ -98,7 +98,7 @@ class MatchHistoryServiceTest {
         Match match = Match.builder()
                 .matchId("match_id")
                 .gameCreation(123L)
-                .participants(List.of(Participant.builder()
+                .participants(Set.of(Participant.builder()
                         .summonerName(summonerName)
                         .build()))
                 .build();
@@ -111,14 +111,14 @@ class MatchHistoryServiceTest {
         Match newEarlierMatch = Match.builder()
                 .matchId("match_id1")
                 .gameCreation(99L)
-                .participants(List.of(Participant.builder()
+                .participants(Set.of(Participant.builder()
                         .summonerName(summonerName)
                         .build()))
                 .build();
         Match newLaterMatch = Match.builder()
                 .matchId("match_id2")
                 .gameCreation(225L)
-                .participants(List.of(Participant.builder()
+                .participants(Set.of(Participant.builder()
                         .summonerName(summonerName)
                         .build()))
                 .build();

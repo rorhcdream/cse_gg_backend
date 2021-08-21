@@ -3,7 +3,7 @@ package gg.cse.domain;
 import lombok.*;
 
 import javax.persistence.*;
-import java.util.List;
+import java.util.Set;
 
 @Getter
 @NoArgsConstructor
@@ -30,5 +30,5 @@ public class Match {
 
     @ElementCollection
     @CollectionTable(name="match_participants", joinColumns = @JoinColumn(name = "match_id"))
-    private List<Participant> participants;
+    private Set<Participant> participants;
 }
