@@ -1,15 +1,35 @@
 package gg.cse.dto.riotDto;
 
-import lombok.Getter;
+import gg.cse.domain.Match;
+import gg.cse.domain.Participant;
+import gg.cse.util.ModelMapperUtil;
+import lombok.*;
+import lombok.extern.slf4j.Slf4j;
+import org.modelmapper.ModelMapper;
+import org.modelmapper.Provider;
+import org.modelmapper.config.Configuration;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Getter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@EqualsAndHashCode
+@ToString
+@Slf4j
 public class MatchDto {
     private Info info;
     private Metadata metadata;
 
     @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    @EqualsAndHashCode
+    @ToString
     public static class Metadata {
         private List<String> participants;
         private String matchId;
@@ -17,6 +37,12 @@ public class MatchDto {
     }
 
     @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    @EqualsAndHashCode
+    @ToString
     public static class Info {
         private long gameCreation;
         private long gameDuration;
@@ -31,6 +57,11 @@ public class MatchDto {
     }
 
     @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    @EqualsAndHashCode
+    @ToString
     public static class Participant {
         private boolean win;
         private int wardsPlaced;
@@ -139,12 +170,22 @@ public class MatchDto {
         private int assists;
 
         @Getter
+        @NoArgsConstructor
+        @AllArgsConstructor
+        @Builder
+        @EqualsAndHashCode
+        @ToString
         public static class Perks {
             private List<Styles> styles;
             private StatPerks statPerks;
         }
 
         @Getter
+        @NoArgsConstructor
+        @AllArgsConstructor
+        @Builder
+        @EqualsAndHashCode
+        @ToString
         public static class Styles {
             private int style;
             private List<Selections> selections;
@@ -152,6 +193,11 @@ public class MatchDto {
         }
 
         @Getter
+        @NoArgsConstructor
+        @AllArgsConstructor
+        @Builder
+        @EqualsAndHashCode
+        @ToString
         public static class Selections {
             private int var3;
             private int var2;
@@ -160,10 +206,73 @@ public class MatchDto {
         }
 
         @Getter
+        @NoArgsConstructor
+        @AllArgsConstructor
+        @Builder
+        @EqualsAndHashCode
+        @ToString
         public static class StatPerks {
             private int offense;
             private int flex;
             private int defense;
         }
+    }
+
+    public static MatchDto of(Match entity) {
+        ModelMapper modelMapper = ModelMapperUtil.get();
+
+        MatchDto.Info info = Info.builder()
+                .gameCreation(entity.getGameCreation())
+                .gameDuration(entity.getGameDuration())
+                .gameId(entity.getGameId())
+                .gameMode(entity.getGameMode())
+                .gameName(entity.getGameName())
+                .gameStartTimeStamp(entity.getGameStartTimeStamp())
+                .gameType(entity.getGameType())
+                .gameVersion(entity.getGameVersion())
+                .mapId(entity.getMapId())
+                .participants(entity.getParticipants().stream()
+                        .map(participant -> modelMapper.map(participant, Participant.class))
+                        .collect(Collectors.toList())
+                )
+                .build();
+        MatchDto.Metadata metadata = Metadata.builder()
+                .matchId(entity.getMatchId())
+                .dataVersion(entity.getDataVersion())
+                .participants(entity.getParticipants().stream()
+                        .map(gg.cse.domain.Participant::getPuuid)
+                        .collect(Collectors.toList())
+                )
+                .build();
+        return MatchDto.builder()
+                .info(info)
+                .metadata(metadata)
+                .build();
+    }
+
+    public Match toEntity() {
+        ModelMapper modelMapper = ModelMapperUtil.get();
+
+        modelMapper.typeMap(MatchDto.class, Match.class).setProvider(
+                request -> {
+                    MatchDto matchDto = (MatchDto) request.getSource();
+                    return new Match(
+                            matchDto.metadata.matchId,
+                            matchDto.metadata.dataVersion,
+                            matchDto.info.gameCreation,
+                            matchDto.info.gameDuration,
+                            matchDto.info.gameId,
+                            matchDto.info.gameMode,
+                            matchDto.info.gameName,
+                            matchDto.info.gameStartTimeStamp,
+                            matchDto.info.gameType,
+                            matchDto.info.gameVersion,
+                            matchDto.info.mapId,
+                            matchDto.info.participants.stream().map(
+                                    participant -> modelMapper.map(participant, gg.cse.domain.Participant.class)
+                            ).collect(Collectors.toSet())
+                    );
+                });
+        return modelMapper.map(this, Match.class);
     }
 }

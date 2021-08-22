@@ -16,7 +16,7 @@ import java.util.List;
 
 @Component
 public class RiotAPI {
-    @Value("${riot-api-key}")
+    @Value("${riot-api-key:}")
     private String api_key;
     private final String base_url = "https://%s.api.riotgames.com";
     private final String kr_region = "kr";
