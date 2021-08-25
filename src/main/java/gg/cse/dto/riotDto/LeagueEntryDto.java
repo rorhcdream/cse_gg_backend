@@ -1,6 +1,9 @@
 package gg.cse.dto.riotDto;
 
+import gg.cse.domain.LeagueEntry;
+import gg.cse.util.ModelMapperUtil;
 import lombok.*;
+import org.modelmapper.ModelMapper;
 
 @Getter
 @NoArgsConstructor
@@ -22,4 +25,14 @@ public class LeagueEntryDto {
     private boolean veteran;
     private boolean freshBlood;
     private boolean inactive;
+
+    public LeagueEntry toEntity() {
+        ModelMapper modelMapper = ModelMapperUtil.get();
+        return modelMapper.map(this, LeagueEntry.class);
+    }
+
+    public static LeagueEntryDto of(LeagueEntry entity) {
+        ModelMapper modelMapper = ModelMapperUtil.get();
+        return modelMapper.map(entity, LeagueEntryDto.class);
+    }
 }
