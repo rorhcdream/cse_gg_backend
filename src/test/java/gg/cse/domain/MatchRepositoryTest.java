@@ -1,5 +1,6 @@
 package gg.cse.domain;
 
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -7,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -14,6 +16,7 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@Slf4j
 @SpringBootTest
 class MatchRepositoryTest {
     @Autowired
@@ -101,5 +104,25 @@ class MatchRepositoryTest {
         Match match1 = matches.get(0);
 
         assertEquals(match, match1);
+    }
+
+    @Transactional
+    @Test
+    public void created_time() {
+        LocalDateTime now = LocalDateTime.now();
+        Match match = Match.builder()
+                .matchId("KR_5371736468")
+                .gameCreation(1628150406000L)
+                .participants(participants)
+                .build();
+
+        matchRepository.save(match);
+
+        List<Match> matches = matchRepository.findAll();
+        Match resultMatch = matches.get(0);
+
+        log.info("now: " + now);
+        log.info("created: " + resultMatch.getCreatedDate());
+        assertFalse(resultMatch.getCreatedDate().isBefore(now));
     }
 }

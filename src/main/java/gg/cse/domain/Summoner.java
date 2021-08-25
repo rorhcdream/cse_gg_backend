@@ -10,10 +10,10 @@ import java.util.stream.Collectors;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper = false)
 @ToString
 @Entity
-public class Summoner {
+public class Summoner extends BaseTimeEntity {
     @Id
     private String puuid;
     private String accountId;

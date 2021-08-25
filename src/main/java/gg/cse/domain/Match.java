@@ -9,11 +9,11 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper = false)
 @ToString
 @Entity
 @Table(name = "match_")
-public class Match {
+public class Match extends BaseTimeEntity {
     @Id
     private String matchId;
 
