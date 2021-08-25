@@ -29,6 +29,10 @@ public class Summoner {
     @Builder.Default
     private Set<Match> matches = new LinkedHashSet<>();
 
+    @ElementCollection
+    @CollectionTable(name="summoner_leagueEntries", joinColumns = @JoinColumn(name = "puuid"))
+    private Set<LeagueEntry> leagueEntries;
+
     public void update(String accountId, int profileIconId, long revisionDate, String name, String summonerId, long summonerLevel) {
         this.accountId = accountId;
         this.profileIconId = profileIconId;
