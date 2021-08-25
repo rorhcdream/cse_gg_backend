@@ -24,63 +24,43 @@ public class RiotAPI {
     private final String kr_region = "kr";
     private final String asia_region = "asia";
 
-    public SummonerDto getSummonerWithName(String summonerName) {
-        final String path = "/lol/summoner/v4/summoners/by-name/";
-        String url = String.format(base_url, kr_region) + path + summonerName;
-
+    private <T> T get(String url, ParameterizedTypeReference<T> responseType) {
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
         headers.set("X-Riot-Token", api_key);
         HttpEntity<String> request = new HttpEntity<>(headers);
+        return restTemplate.exchange(url, HttpMethod.GET, request, responseType).getBody();
+    }
 
-        ResponseEntity<SummonerDto> response;
+    public SummonerDto getSummonerWithName(String summonerName) {
+        final String path = "/lol/summoner/v4/summoners/by-name/";
+        String url = String.format(base_url, kr_region) + path + summonerName;
+
         try {
-            response = restTemplate.exchange(url, HttpMethod.GET, request, SummonerDto.class);
+            return get(url, new ParameterizedTypeReference<SummonerDto>() {});
         } catch (HttpClientErrorException.NotFound e) {
             return null;
         }
-
-        return response.getBody();
     }
 
     public List<String> getMatchHistory(String puuid) {
         final String path = "/lol/match/v5/matches/by-puuid/%s/ids";
         String url = String.format(base_url, asia_region) + String.format(path, puuid);
 
-        RestTemplate restTemplate = new RestTemplate();
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("X-Riot-Token", api_key);
-        HttpEntity<String> request = new HttpEntity<>(headers);
-        ResponseEntity<List<String>> response =
-                restTemplate.exchange(url, HttpMethod.GET, request,
-                        new ParameterizedTypeReference<List<String>>() {});
-        return response.getBody();
+        return get(url, new ParameterizedTypeReference<List<String>>() {});
     }
 
     public MatchDto getMatchWithId(String matchId) {
         final String path = "/lol/match/v5/matches/";
         String url = String.format(base_url, asia_region) + path + matchId;
 
-        RestTemplate restTemplate = new RestTemplate();
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("X-Riot-Token", api_key);
-        HttpEntity<String> request = new HttpEntity<>(headers);
-        ResponseEntity<MatchDto> response =
-                restTemplate.exchange(url, HttpMethod.GET, request, MatchDto.class);
-        return response.getBody();
+        return get(url, new ParameterizedTypeReference<MatchDto>() {});
     }
 
     public Set<LeagueEntryDto> getLeagueEntryOfSummoner(String summonerId) {
         final String path = "/lol/league/v4/entries/by-summoner/";
-        final String url = String.format(base_url, kr_region) + path + summonerId;
+        String url = String.format(base_url, kr_region) + path + summonerId;
 
-        RestTemplate restTemplate = new RestTemplate();
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("X-Riot-Token", api_key);
-        HttpEntity<String> request = new HttpEntity<>(headers);
-        ResponseEntity<Set<LeagueEntryDto>> response =
-                restTemplate.exchange(url, HttpMethod.GET, request,
-                        new ParameterizedTypeReference<Set<LeagueEntryDto>>() {});
-        return response.getBody();
+        return get(url, new ParameterizedTypeReference<Set<LeagueEntryDto>>(){});
     }
 }
