@@ -1,5 +1,6 @@
 package gg.cse.domain;
 
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -8,11 +9,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@Slf4j
 @SpringBootTest
 class SummonerRepositoryTest {
     @Autowired
@@ -127,5 +130,37 @@ class SummonerRepositoryTest {
 
         assertEquals(summoner, summonerRepository.findByNameIgnoreCase(name).get());
         assertTrue(summonerRepository.findByNameIgnoreCase("some non-existing name").isEmpty());
+    }
+
+    @Transactional
+    @Test
+    public void created_modified_date() throws Exception {
+        LocalDateTime now = LocalDateTime.now();
+        summonerRepository.save(summoner);
+
+        Summoner resultSummoner = summonerRepository.findAll().get(0);
+
+        log.info("now: " + now);
+        log.info("created: " + resultSummoner.getCreatedDate());
+        log.info("modified: " + resultSummoner.getModifiedDate());
+        assertFalse(resultSummoner.getCreatedDate().isBefore(now));
+        assertFalse(resultSummoner.getModifiedDate().isBefore(now));
+
+        Thread.sleep(200);
+        resultSummoner.update(
+                "account_id",
+                1,
+                2L,
+                "name",
+                "summoner_id",
+                3L
+        );
+        summonerRepository.save(resultSummoner);
+        resultSummoner = summonerRepository.findAll().get(0);
+
+        log.info("now: " + now);
+        log.info("created: " + resultSummoner.getCreatedDate());
+        log.info("modified: " + resultSummoner.getModifiedDate());
+        assertTrue(resultSummoner.getModifiedDate().isAfter(resultSummoner.getCreatedDate()));
     }
 }

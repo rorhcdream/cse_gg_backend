@@ -3,6 +3,8 @@ package gg.cse.service.search;
 import gg.cse.domain.RiotAPI;
 import gg.cse.domain.Summoner;
 import gg.cse.domain.SummonerRepository;
+import gg.cse.dto.SummonerInfoDto;
+import gg.cse.dto.riotDto.LeagueEntryDto;
 import gg.cse.dto.riotDto.SummonerDto;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -11,6 +13,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -34,9 +37,9 @@ class SummonerServiceTest {
                 .build();
         when(summonerRepository.findByNameIgnoreCase(summonerName)).thenReturn(Optional.of(summoner));
 
-        Optional<SummonerDto> summonerDtoOptional = summonerService.getSummoner(summonerName);
-        assertTrue(summonerDtoOptional.isPresent());
-        assertEquals(summonerName, summonerDtoOptional.get().getName());
+        Optional<SummonerInfoDto> summonerInfoDtoOptional = summonerService.getSummoner(summonerName);
+        assertTrue(summonerInfoDtoOptional.isPresent());
+        assertEquals(summonerName, summonerInfoDtoOptional.get().getSummoner().getName());
     }
 
     @Test
@@ -45,14 +48,14 @@ class SummonerServiceTest {
         Summoner summoner = Summoner.builder()
                 .name(summonerName)
                 .build();
-        when(summonerRepository.findByNameIgnoreCase(summonerName)).thenReturn(Optional.empty());
+        when(summonerRepository.findByNameIgnoreCase(summonerName)).thenReturn(Optional.empty()).thenReturn(Optional.of(summoner));
         when(riotAPI.getSummonerWithName(summonerName)).thenReturn(SummonerDto.of(summoner));
         when(summonerRepository.save(summoner)).thenReturn(null);
 
-        Optional<SummonerDto> summonerDtoOptional = summonerService.getSummoner(summonerName);
+        Optional<SummonerInfoDto> summonerInfoDtoOptional = summonerService.getSummoner(summonerName);
         verify(summonerRepository).save(summoner);
-        assertTrue(summonerDtoOptional.isPresent());
-        assertEquals(summonerName, summonerDtoOptional.get().getName());
+        assertTrue(summonerInfoDtoOptional.isPresent());
+        assertEquals(summonerName, summonerInfoDtoOptional.get().getSummoner().getName());
     }
 
     @Test
@@ -60,8 +63,8 @@ class SummonerServiceTest {
         String summonerName = "not_existing_summoner_name";
         when(summonerRepository.findByNameIgnoreCase(summonerName)).thenReturn(Optional.empty());
 
-        Optional<SummonerDto> summonerDtoOptional = summonerService.getSummoner(summonerName);
-        assertTrue(summonerDtoOptional.isEmpty());
+        Optional<SummonerInfoDto> summonerInfoDtoOptional = summonerService.getSummoner(summonerName);
+        assertTrue(summonerInfoDtoOptional.isEmpty());
     }
 
     @Test
@@ -74,14 +77,23 @@ class SummonerServiceTest {
         SummonerDto updateDto = SummonerDto.builder()
                 .name(summonerName)
                 .summonerLevel(12)
+                .id("summoner_id")
+                .build();
+        LeagueEntryDto leagueEntryDto = LeagueEntryDto.builder()
+                .summonerName(summonerName)
+                .leagueId("league_id")
+                .leaguePoints(12)
                 .build();
         when(summonerRepository.findByNameIgnoreCase(summonerName)).thenReturn(Optional.of(summoner));
         when(summonerRepository.save(any(Summoner.class))).thenReturn(null);
         when(riotAPI.getSummonerWithName(summonerName)).thenReturn(updateDto);
+        when(riotAPI.getLeagueEntryOfSummoner(any(String.class))).thenReturn(Set.of(leagueEntryDto));
 
         Optional<Summoner> summonerOptional = summonerService.updateSummoner(summonerName);
+        SummonerInfoDto summonerInfoDto = summonerService.getSummoner(summonerName).get();
         assertTrue(summonerOptional.isPresent());
-        assertEquals(12, summonerService.getSummoner(summonerName).get().getSummonerLevel());
+        assertEquals(12, summonerInfoDto.getSummoner().getSummonerLevel());
+        assertTrue(summonerInfoDto.getLeagueEntries().contains(leagueEntryDto));
     }
 
     @Test

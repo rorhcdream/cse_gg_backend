@@ -1,5 +1,6 @@
 package gg.cse.domain;
 
+import gg.cse.dto.riotDto.LeagueEntryDto;
 import gg.cse.dto.riotDto.MatchDto;
 import gg.cse.dto.riotDto.SummonerDto;
 import org.junit.jupiter.api.Test;
@@ -8,6 +9,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
 
 import java.util.List;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -69,5 +71,17 @@ public class RiotAPITest {
                         .getParticipants()
                         .get(6),
                 "0e8jipVL71Ss6Q1L3xGXwNGxcsE4wZFZWBaQ0wY8RXxWVzK-hrGnp49dr72AWyf7awzCoTEXvJfJrg");
+    }
+
+    @Test
+    public void get_league_entry_of_summoner() {
+        // encrypted summoner ID of 'hide on bush'
+        String summonerId = "3nCMu3bxMSz6KFcKRnvf5Y6A7Cb0Ev6kvNbOm_dVicWtsA";
+
+        Set<LeagueEntryDto> leagueEntryDtoSet = riotAPI.getLeagueEntryOfSummoner(summonerId);
+        leagueEntryDtoSet.stream()
+                .filter(leagueEntryDto -> leagueEntryDto.getQueueType().equals("RANKED_SOLO_5x5"))
+                .findFirst()
+                .ifPresent(leagueEntryDto -> assertEquals("Hide on bush", leagueEntryDto.getSummonerName()));
     }
 }

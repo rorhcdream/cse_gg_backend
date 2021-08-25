@@ -1,6 +1,6 @@
 package gg.cse.web;
 
-import gg.cse.dto.riotDto.SummonerDto;
+import gg.cse.dto.SummonerInfoDto;
 import gg.cse.service.search.SummonerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -18,8 +18,8 @@ public class SummonerApiController {
     private final SummonerService summonerService;
 
     @GetMapping("/api/v1/summoner/{summonerName}")
-    public ResponseEntity<SummonerDto> get_summoner(@PathVariable String summonerName) {
-        Optional<SummonerDto> result = summonerService.getSummoner(summonerName);
+    public ResponseEntity<SummonerInfoDto> get_summoner(@PathVariable String summonerName) {
+        Optional<SummonerInfoDto> result = summonerService.getSummoner(summonerName);
         return ResponseEntity.of(result);
     }
 

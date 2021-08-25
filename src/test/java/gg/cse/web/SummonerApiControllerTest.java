@@ -1,6 +1,7 @@
 package gg.cse.web;
 
 import gg.cse.domain.Summoner;
+import gg.cse.dto.SummonerInfoDto;
 import gg.cse.dto.riotDto.SummonerDto;
 import gg.cse.service.search.SummonerService;
 import org.junit.jupiter.api.Test;
@@ -35,12 +36,16 @@ class SummonerApiControllerTest {
                 .name(summonerName)
                 .puuid("puuid")
                 .build();
+        SummonerInfoDto summonerInfoDto = SummonerInfoDto.builder()
+                .summoner(summonerDto)
+                .build();
         when(summonerService.getSummoner(summonerName))
-                .thenReturn(Optional.of(summonerDto));
+                .thenReturn(Optional.of(summonerInfoDto));
 
         mockMvc.perform(get("/api/v1/summoner/" + summonerName))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$").value(summonerDto));
+                .andExpect(jsonPath("$.summoner").value(summonerInfoDto.getSummoner()))
+                .andExpect(jsonPath("$.leagueEntries").value(summonerInfoDto.getLeagueEntries()));
     }
 
     @Test

@@ -10,10 +10,10 @@ import java.util.stream.Collectors;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper = false)
 @ToString
 @Entity
-public class Summoner {
+public class Summoner extends BaseTimeEntity {
     @Id
     private String puuid;
     private String accountId;
@@ -29,6 +29,11 @@ public class Summoner {
     @Builder.Default
     private Set<Match> matches = new LinkedHashSet<>();
 
+    @ElementCollection
+    @CollectionTable(name="summoner_leagueEntries", joinColumns = @JoinColumn(name = "puuid"))
+    @Builder.Default
+    private Set<LeagueEntry> leagueEntries = new HashSet<>();
+
     public void update(String accountId, int profileIconId, long revisionDate, String name, String summonerId, long summonerLevel) {
         this.accountId = accountId;
         this.profileIconId = profileIconId;
@@ -36,6 +41,10 @@ public class Summoner {
         this.name = name;
         this.summonerId = summonerId;
         this.summonerLevel = summonerLevel;
+    }
+
+    public void updateLeagueEntries(Set<LeagueEntry> leagueEntries) {
+        this.leagueEntries = leagueEntries;
     }
 
     // returns up to num recent Match elements

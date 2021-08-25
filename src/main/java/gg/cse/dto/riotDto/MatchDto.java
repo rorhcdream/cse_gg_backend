@@ -253,26 +253,20 @@ public class MatchDto {
     public Match toEntity() {
         ModelMapper modelMapper = ModelMapperUtil.get();
 
-        modelMapper.typeMap(MatchDto.class, Match.class).setProvider(
-                request -> {
-                    MatchDto matchDto = (MatchDto) request.getSource();
-                    return new Match(
-                            matchDto.metadata.matchId,
-                            matchDto.metadata.dataVersion,
-                            matchDto.info.gameCreation,
-                            matchDto.info.gameDuration,
-                            matchDto.info.gameId,
-                            matchDto.info.gameMode,
-                            matchDto.info.gameName,
-                            matchDto.info.gameStartTimeStamp,
-                            matchDto.info.gameType,
-                            matchDto.info.gameVersion,
-                            matchDto.info.mapId,
-                            matchDto.info.participants.stream().map(
-                                    participant -> modelMapper.map(participant, gg.cse.domain.Participant.class)
-                            ).collect(Collectors.toSet())
-                    );
-                });
-        return modelMapper.map(this, Match.class);
+        return Match.builder()
+                .matchId(metadata.matchId)
+                .dataVersion(metadata.dataVersion)
+                .gameCreation(info.gameCreation)
+                .gameId(info.gameId)
+                .gameMode(info.gameMode)
+                .gameName(info.gameName)
+                .gameStartTimeStamp(info.gameStartTimeStamp)
+                .gameType(info.gameType)
+                .gameVersion(info.gameVersion)
+                .mapId(info.mapId)
+                .participants(info.participants.stream().map(
+                        participant -> modelMapper.map(participant, gg.cse.domain.Participant.class)
+                ).collect(Collectors.toSet()))
+                .build();
     }
 }
