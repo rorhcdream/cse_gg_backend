@@ -3,12 +3,16 @@ package gg.cse.service.search;
 import gg.cse.domain.RiotAPI;
 import gg.cse.domain.Summoner;
 import gg.cse.domain.SummonerRepository;
+import gg.cse.dto.SummonerInfoDto;
+import gg.cse.dto.riotDto.LeagueEntryDto;
 import gg.cse.dto.riotDto.SummonerDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class SummonerService {
@@ -19,7 +23,7 @@ public class SummonerService {
     private RiotAPI riotAPI;
 
     @Transactional
-    public Optional<SummonerDto> getSummoner(String summonerName) {
+    public Optional<SummonerInfoDto> getSummoner(String summonerName) {
         Optional<Summoner> summonerOptional = summonerRepository.findByNameIgnoreCase(summonerName);
 
         // update summoner info when no summoner in repository
@@ -28,7 +32,7 @@ public class SummonerService {
             if(summonerOptional.isEmpty())
                 return Optional.empty();
         }
-        return Optional.of(SummonerDto.of(summonerOptional.get()));
+        return Optional.of(SummonerInfoDto.of(summonerOptional.get()));
     }
 
     // returns Optional.empty() when no such summoner
@@ -47,6 +51,11 @@ public class SummonerService {
         else {
             updatedSummoner = summonerDto.toEntity();
         }
+
+        Set<LeagueEntryDto> leagueEntryDtos = riotAPI.getLeagueEntryOfSummoner(updatedSummoner.getSummonerId());
+        updatedSummoner.updateLeagueEntries(leagueEntryDtos.stream()
+                .map(LeagueEntryDto::toEntity)
+                .collect(Collectors.toSet()));
 
         summonerRepository.save(updatedSummoner);
         return Optional.of(updatedSummoner);

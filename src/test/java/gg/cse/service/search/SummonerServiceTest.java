@@ -3,6 +3,7 @@ package gg.cse.service.search;
 import gg.cse.domain.RiotAPI;
 import gg.cse.domain.Summoner;
 import gg.cse.domain.SummonerRepository;
+import gg.cse.dto.SummonerInfoDto;
 import gg.cse.dto.riotDto.SummonerDto;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -34,9 +35,9 @@ class SummonerServiceTest {
                 .build();
         when(summonerRepository.findByNameIgnoreCase(summonerName)).thenReturn(Optional.of(summoner));
 
-        Optional<SummonerDto> summonerDtoOptional = summonerService.getSummoner(summonerName);
-        assertTrue(summonerDtoOptional.isPresent());
-        assertEquals(summonerName, summonerDtoOptional.get().getName());
+        Optional<SummonerInfoDto> summonerInfoDtoOptional = summonerService.getSummoner(summonerName);
+        assertTrue(summonerInfoDtoOptional.isPresent());
+        assertEquals(summonerName, summonerInfoDtoOptional.get().getSummoner().getName());
     }
 
     @Test
@@ -49,10 +50,10 @@ class SummonerServiceTest {
         when(riotAPI.getSummonerWithName(summonerName)).thenReturn(SummonerDto.of(summoner));
         when(summonerRepository.save(summoner)).thenReturn(null);
 
-        Optional<SummonerDto> summonerDtoOptional = summonerService.getSummoner(summonerName);
+        Optional<SummonerInfoDto> summonerInfoDtoOptional = summonerService.getSummoner(summonerName);
         verify(summonerRepository).save(summoner);
-        assertTrue(summonerDtoOptional.isPresent());
-        assertEquals(summonerName, summonerDtoOptional.get().getName());
+        assertTrue(summonerInfoDtoOptional.isPresent());
+        assertEquals(summonerName, summonerInfoDtoOptional.get().getSummoner().getName());
     }
 
     @Test
@@ -60,8 +61,8 @@ class SummonerServiceTest {
         String summonerName = "not_existing_summoner_name";
         when(summonerRepository.findByNameIgnoreCase(summonerName)).thenReturn(Optional.empty());
 
-        Optional<SummonerDto> summonerDtoOptional = summonerService.getSummoner(summonerName);
-        assertTrue(summonerDtoOptional.isEmpty());
+        Optional<SummonerInfoDto> summonerInfoDtoOptional = summonerService.getSummoner(summonerName);
+        assertTrue(summonerInfoDtoOptional.isEmpty());
     }
 
     @Test
@@ -81,7 +82,7 @@ class SummonerServiceTest {
 
         Optional<Summoner> summonerOptional = summonerService.updateSummoner(summonerName);
         assertTrue(summonerOptional.isPresent());
-        assertEquals(12, summonerService.getSummoner(summonerName).get().getSummonerLevel());
+        assertEquals(12, summonerService.getSummoner(summonerName).get().getSummoner().getSummonerLevel());
     }
 
     @Test

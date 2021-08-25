@@ -31,7 +31,8 @@ public class Summoner {
 
     @ElementCollection
     @CollectionTable(name="summoner_leagueEntries", joinColumns = @JoinColumn(name = "puuid"))
-    private Set<LeagueEntry> leagueEntries;
+    @Builder.Default
+    private Set<LeagueEntry> leagueEntries = new HashSet<>();
 
     public void update(String accountId, int profileIconId, long revisionDate, String name, String summonerId, long summonerLevel) {
         this.accountId = accountId;
@@ -40,6 +41,10 @@ public class Summoner {
         this.name = name;
         this.summonerId = summonerId;
         this.summonerLevel = summonerLevel;
+    }
+
+    public void updateLeagueEntries(Set<LeagueEntry> leagueEntries) {
+        this.leagueEntries = leagueEntries;
     }
 
     // returns up to num recent Match elements
