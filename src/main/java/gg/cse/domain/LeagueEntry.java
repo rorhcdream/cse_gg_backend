@@ -2,6 +2,7 @@ package gg.cse.domain;
 
 import lombok.*;
 
+import javax.persistence.Column;
 import javax.persistence.Embeddable;
 
 @Getter
@@ -17,6 +18,7 @@ public class LeagueEntry {
     private String summonerName;
     private String queueType;
     private String tier;
+    @Column(name = "rank_")
     private String rank;
     private int leaguePoints;
     private int wins;
