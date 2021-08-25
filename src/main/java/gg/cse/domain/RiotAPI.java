@@ -1,5 +1,6 @@
 package gg.cse.domain;
 
+import gg.cse.dto.riotDto.LeagueEntryDto;
 import gg.cse.dto.riotDto.MatchDto;
 import gg.cse.dto.riotDto.SummonerDto;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,6 +14,7 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
+import java.util.Set;
 
 @Component
 public class RiotAPI {
@@ -65,6 +67,20 @@ public class RiotAPI {
         HttpEntity<String> request = new HttpEntity<>(headers);
         ResponseEntity<MatchDto> response =
                 restTemplate.exchange(url, HttpMethod.GET, request, MatchDto.class);
+        return response.getBody();
+    }
+
+    public Set<LeagueEntryDto> getLeagueEntryOfSummoner(String summonerId) {
+        final String path = "/lol/league/v4/entries/by-summoner/";
+        final String url = String.format(base_url, kr_region) + path + summonerId;
+
+        RestTemplate restTemplate = new RestTemplate();
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("X-Riot-Token", api_key);
+        HttpEntity<String> request = new HttpEntity<>(headers);
+        ResponseEntity<Set<LeagueEntryDto>> response =
+                restTemplate.exchange(url, HttpMethod.GET, request,
+                        new ParameterizedTypeReference<Set<LeagueEntryDto>>() {});
         return response.getBody();
     }
 }
