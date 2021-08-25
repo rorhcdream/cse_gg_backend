@@ -22,16 +22,17 @@ public class SummonerService {
     @Autowired
     private RiotAPI riotAPI;
 
-    @Transactional
     public Optional<SummonerInfoDto> getSummoner(String summonerName) {
         Optional<Summoner> summonerOptional = summonerRepository.findByNameIgnoreCase(summonerName);
 
         // update summoner info when no summoner in repository
         if (summonerOptional.isEmpty()) {
-            summonerOptional = updateSummoner(summonerName);
+            updateSummoner(summonerName);
+            summonerOptional = summonerRepository.findByNameIgnoreCase(summonerName);
             if(summonerOptional.isEmpty())
                 return Optional.empty();
         }
+
         return Optional.of(SummonerInfoDto.of(summonerOptional.get()));
     }
 

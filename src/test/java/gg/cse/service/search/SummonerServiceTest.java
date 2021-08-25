@@ -48,7 +48,7 @@ class SummonerServiceTest {
         Summoner summoner = Summoner.builder()
                 .name(summonerName)
                 .build();
-        when(summonerRepository.findByNameIgnoreCase(summonerName)).thenReturn(Optional.empty());
+        when(summonerRepository.findByNameIgnoreCase(summonerName)).thenReturn(Optional.empty()).thenReturn(Optional.of(summoner));
         when(riotAPI.getSummonerWithName(summonerName)).thenReturn(SummonerDto.of(summoner));
         when(summonerRepository.save(summoner)).thenReturn(null);
 

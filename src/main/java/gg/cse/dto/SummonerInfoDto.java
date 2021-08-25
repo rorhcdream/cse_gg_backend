@@ -5,6 +5,7 @@ import gg.cse.dto.riotDto.LeagueEntryDto;
 import gg.cse.dto.riotDto.SummonerDto;
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -17,6 +18,7 @@ import java.util.stream.Collectors;
 public class SummonerInfoDto {
     private SummonerDto summoner;
     private Set<LeagueEntryDto> leagueEntries;
+    private LocalDateTime lastUpdated;
 
     public static SummonerInfoDto of(Summoner entity) {
         return SummonerInfoDto.builder()
@@ -24,6 +26,7 @@ public class SummonerInfoDto {
                 .leagueEntries(entity.getLeagueEntries().stream()
                         .map(LeagueEntryDto::of)
                         .collect(Collectors.toSet()))
+                .lastUpdated(entity.getModifiedDate())
                 .build();
     }
 }
